@@ -1,7 +1,17 @@
 QuickXml Writer lets you get Trades from dukascopy strategy to XML.
 
+Download compiled version at :
+
+https://github.com/downloads/fxmozart/Xml-Trade-Writer/QuickXmlWriter.jar
+
+Basic Strategy using QuickXmlWriter :
+
 
 To actually use it you must just paste in your strategies :
+
+https://github.com/downloads/fxmozart/Xml-Trade-Writer/MA_Play.java
+
+
 
 //At the top of the file like this:
 @Library("QuickXmlWriter.jar");
