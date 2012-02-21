@@ -7,12 +7,14 @@ https://github.com/downloads/fxmozart/Xml-Trade-Writer/QuickXmlWriter.jar
 Basic Strategy using QuickXmlWriter :
 
 
-To actually use it you must just paste in your strategies :
-
 https://github.com/downloads/fxmozart/Xml-Trade-Writer/MA_Play.java
 
 
+-------------------------------
+<b>Usage :</b>
 
+
+To actually use it you must just paste in your strategies :
 //At the top of the file like this:
 @Library("QuickXmlWriter.jar");
 @RequiresFullAccess
