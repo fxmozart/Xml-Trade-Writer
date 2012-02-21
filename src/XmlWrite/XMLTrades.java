@@ -244,8 +244,13 @@ public class XMLTrades{
       return myNumber;
   } 
    /**
- * Gets the day of the year. 
-       */
+ * Get the current day of the year (when trade was opened).               
+@param  None.
+ *  
+                          
+@return     a string with day of the year (int)..
+ *                
+ */
   public String GetDayOfYear()
   {      
        Calendar rightNow = Calendar.getInstance();
@@ -254,7 +259,14 @@ public class XMLTrades{
        String myNumber = nf.format(rightNow.DAY_OF_YEAR);
       return myNumber;
   } 
-  
+   /**
+ * Get the current time (of the trade) as milliseconds).                 
+@param  None.
+ *  
+                          
+@return     a string with time trade time as long (milliseconds).
+ *                
+ */
   public String GetTimeAsTick()
   {    
        Calendar rightNow = Calendar.getInstance();
