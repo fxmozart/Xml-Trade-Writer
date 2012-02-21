@@ -4,8 +4,6 @@ QuickXml Writer lets you get Trades from dukascopy strategy to XML.
 To actually use it you must just paste in your strategies :
 
 //Variables used by XmlWriter.
-String FileLocationForXml ="c:\\Trading\\Trades1.Xml";
-public static Document dom;
 public static String SystemName="WINPROF";
 public static String MagicNumber = "121266";
 
@@ -15,24 +13,11 @@ Inside On Message add also :
 
  public void onMessage(IMessage message) throws JFException 
     {
-         if (message != null && message.getType() == IMessage.Type.ORDER_CLOSE_OK) {
-                IOrder lastOne = message.getOrder();
-                double profitsLoss = lastOne.getProfitLossInPips();
-                if (profitsLoss > 0) {
-                    wins++;
-                } else {
-                    losses++;
-                }
-                int t = wins + losses;
-                console.getOut().println("Super Order: " + lastOne.getLabel() +  " " + lastOne.getOrderCommand() + " Pips: " + profitsLoss + " Loss: " + losses + "(" + (losses * 100 / t) + "%) Win: " + wins + "(" + (wins * 100 / t) + "%)");
-           
-             
-                
-                  ParseMessageToTradeXML(message,"Close"); }
-            
-              if (message != null && message.getType() == IMessage.Type.ORDER_FILL_OK && message.getType() != IMessage.Type.ORDER_CLOSE_OK) {
-                  PrintaMessage(message.getContent());
-                  ParseMessageToTradeXML(message,"Open"); }
+      if (message.getType().equals(IMessage.Type.ORDER_FILL_OK) ||message.getType().equals(IMessage.Type.ORDER_CLOSE_OK))
+      { 
+			//It auto detects if order is a close or open....
+             XMLTrades t = new XMLTrades(MagicNumber,SystemName,message); 
+      } 
     }
 
 
@@ -40,18 +25,23 @@ This will make the XmlWriter class write xml (which can be used for other things
 
 <?xml version="1.0" encoding="UTF-8"?>
 <Trade>
-    <Symbol>EUR/USD</Symbol>
-    <Operation>Close</Operation>
-    <System>WINPROF</System>
-    <EntryPrice>1.31271</EntryPrice>
-    <StopPrice>1.30611</StopPrice>
-    <LimitPrice>1.31491</LimitPrice>
+    <Symbol>EURUSD</Symbol>
+    <Operation>Open</Operation>
+    <System>MAPlay</System>
+    <EntryPrice>1.31976</EntryPrice>
+    <StopPrice>1.21974</StopPrice>
+    <LimitPrice>1.32064</LimitPrice>
     <Side>Buy</Side>
     <OrderType>Market</OrderType>
     <TrailingStop>1</TrailingStop>
     <TimeZone>0</TimeZone>
-    <DayOfYear>6</DayOfYear>
-    <DayOfWeek>7</DayOfWeek>
+    <DayOfYear>52</DayOfYear>
+    <DayOfWeek>3</DayOfWeek>
     <Multiplier>1</Multiplier>
+    <MagicNumber>121212</MagicNumber>
+    <EntryHours>18</EntryHours>
+    <EntryMinutes>55</EntryMinutes>
+    <Ticks>1,329,846,933,332</Ticks>
+    <EntryDate>2012-1-21</EntryDate>
     <Version>1.3</Version>
 </Trade>
