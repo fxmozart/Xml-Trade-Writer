@@ -5,14 +5,14 @@
 
 package XmlWrite;
 
+import com.dukascopy.api.IMessage;
 import java.util.Date;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.DOMException;
-import java.util.List;
+
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,6 +21,8 @@ import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 
@@ -33,13 +35,13 @@ public class XMLTrades{
 
 
 
-  
+   public static final String FORMAT_YYYYMMDD = "yyyy-MM-dd";
   private Document dom;
   
    private String SystemName;
     private double EntryPrice;
      private long EntryTicks = 0;
-     private Date EntryDate;
+     private Calendar EntryDate;
      private String EntryHours ;
      private String EntryMinutes ;
      private String Operation;
@@ -55,14 +57,17 @@ public class XMLTrades{
      private String Version = "1.3";
      private String Symbol;
      String DayOfWeek;
-     List ArrayedData;
+     String FileLocation="c:\\TradingSystems\\Tests\\Trades1.xml";
+     
+     
+
   /**
    * 
    * @param isbn
    * @param title
    * @param authorName
    */
-  public XMLTrades(String systemName,String symbol,String operation, double entryPrice,double limitPrice, double stopPrice,String side, String ordertype,String magicNumber ) {
+  public XMLTrades(String systemName,String symbol,String operation, double entryPrice,double limitPrice, double stopPrice,String side, String ordertype,String magicNumber, IMessage message ) {
    
       this.EntryPrice=entryPrice;
       this.StopPrice=stopPrice;
@@ -77,18 +82,13 @@ public class XMLTrades{
       this.EntryHours= GetEntryHour();
       this.EntryMinutes=GetEntryMinute();
       this.DayOfWeek = GetDayOfWeek();
-      
   
+      this.EntryDate = Calendar.getInstance();
       
-      this.ArrayedData =  new ArrayList();
-      this.ArrayedData.add(EntryPrice);
-      this.ArrayedData.add(StopPrice);
-      this.ArrayedData.add(LimitPrice);   
-    
-            
-      
-      
-  }
+      this.ParseMessageToTradeXML(message, Operation);
+  
+     
+    }
 
   /**
    * 
@@ -186,6 +186,15 @@ public class XMLTrades{
     return this.StopPrice;
   }
     
+    
+    public String GetEntryDate()
+    {
+       
+       
+        return (EntryDate.get(Calendar.YEAR) +"-"+ EntryDate.get(Calendar.MONTH)+"-"+EntryDate.get(Calendar.DAY_OF_MONTH));
+        
+        
+    }
     public double GetLimitPrice() {
     return this.LimitPrice;
   }    
@@ -298,11 +307,8 @@ public class XMLTrades{
          try{
             createDocument();
             Element TradeRootElement = dom.createElement("Trade");
-            WriteElmements(TradeRootElement);
-
-             
-              
-              //  (String Name , String value,Element RootElement)
+                dom.appendChild(TradeRootElement);
+            //  (String Name , String value,Element RootElement)
                 //Add symbol
                 AppendElmementInDoc("Symbol",b.GetSymbol(),TradeRootElement);
                 //Add operation
@@ -330,6 +336,23 @@ public class XMLTrades{
                 AppendElmementInDoc("DayOfWeek",b.GetDayOfWeek(),TradeRootElement);
                  //OrderType		 
                 AppendElmementInDoc("Multiplier","1",TradeRootElement);
+                
+                  //OrderType		 
+                AppendElmementInDoc("MagicNumber",b.GetMagicNumber(),TradeRootElement);
+                
+                  //EntryHour		 
+                AppendElmementInDoc("EntryHours",b.GetEntryHour(),TradeRootElement);
+                //Entry Minutes
+                 AppendElmementInDoc("EntryMinutes",b.GetEntryMinute(),TradeRootElement);
+                 
+                  //Entry Time as Ticks
+                 AppendElmementInDoc("Ticks",b.GetTimeAsTick(),TradeRootElement);
+                 
+                 //Entry Minutes
+                 AppendElmementInDoc("EntryDate",b.GetEntryDate(),TradeRootElement);
+                 
+                 
+                 
                  //OrderType		 
                 AppendElmementInDoc("Version",b.GetVersion(),TradeRootElement);
                 
@@ -348,12 +371,7 @@ public class XMLTrades{
 
 	}
 
-    private void WriteElmements(Element TradeRootElement) throws DOMException {
-        dom.appendChild(TradeRootElement);
 
-        //No enhanced for
-    }
-    
    /**
  * A helper method (private) , which appends values and strings to the root element 
   */   
@@ -374,13 +392,58 @@ public class XMLTrades{
  * A helper method (private) , which writes the trade object to file                          
 @param  the string (wherer to write the xml file).
  *   */ 
-public void pTradesToFile(String path){
+private void ParseMessageToTradeXML(IMessage message, String Operation) {
+        //Lets get the various stuff we need from the order..
+             String curSide;
+             if (message.getOrder().isLong())
+             curSide ="Buy";
+             else curSide="Sell";
+             String systemName = this.SystemName;
+             
+             String symbol = message.getOrder().getInstrument().toString();
+             String CurrentOperation = Operation;
+             String OrderType = "Market";
+             String Magic = this.MagicNumber;
+             
+             double entryPrice =message.getOrder().getOpenPrice();
+             double StopPrice =message.getOrder().getStopLossPrice();
+             double LimitPrice =message.getOrder().getTakeProfitPrice();
+           // (String systemName,String symbol,String operation, double entryPrice,double limitPrice, double stopPrice,String side, String ordertype,String magicNumber ) {
+   
+             
+             if (Operation.equals("Close"))
+             { 
+                 //Parse message to XmlTrade class.
+           // XMLTrades trade = new XMLTrades(systemName,symbol,CurrentOperation,entryPrice,LimitPrice,StopPrice,curSide,"Market",Magic, message);
+             
+             //Create the document.
+             Element FullTrade = createBookElement2(this);
+             //Write the message to file..
+             pTradesToFile(this.FileLocation);       
+    }
+
+              if (Operation.equals("Open"))
+             { 
+                 //Parse message to XmlTrade class.
+            // XMLTrades trade = new XMLTrades(systemName,symbol,CurrentOperation,entryPrice,LimitPrice,StopPrice,curSide,"Market",Magic,message);
+             
+             //Create the document.
+             createBookElement2(this);
+             //Write the message to file..
+             pTradesToFile(this.FileLocation);       
+    }
+
+    }
+
+         
+  
+
+private void pTradesToFile(String path){
                         try{
 		        OutputFormat format = new OutputFormat(dom);
 			format.setIndenting(true);
 
                        
-                        
 			//to generate output to console use this serializer
 			XMLSerializer serializer = new XMLSerializer(System.out, format);
 serializer.serialize(dom);
@@ -391,6 +454,7 @@ serializer.serialize(dom);
 			new FileOutputStream(new File(path)), format);
 
 			serializer.serialize(dom);
+                        dom = null;
 
 		} 
                 catch(IOException ie) {
@@ -399,8 +463,9 @@ serializer.serialize(dom);
                   
  
                 }
-         
-  
+
+
+
 /**Creates the xml document. */
  private void createDocument() {
 
