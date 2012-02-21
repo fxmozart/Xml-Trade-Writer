@@ -36,7 +36,7 @@ Inside On Message add also :
     }
 
 
-This will make the XmlWriter class write xml (which can be used for other things like web services, etc..).
+This will make the XmlWriter class write xml (which can be used for other things like web services, MT4 cloner's, analysis and so forth).
 
 <?xml version="1.0" encoding="UTF-8"?>
 <Trade>
