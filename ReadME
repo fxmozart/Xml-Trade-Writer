@@ -3,7 +3,13 @@ QuickXml Writer lets you get Trades from dukascopy strategy to XML.
 
 To actually use it you must just paste in your strategies :
 
-//Variables used by XmlWriter.
+//At the top of the file like this:
+@Library("QuickXmlWriter.jar");
+@RequiresFullAccess
+public class MyStrategy implements IStrategy{
+
+
+//Add 2 variables 
 public static String SystemName="WINPROF";
 public static String MagicNumber = "121266";
 
